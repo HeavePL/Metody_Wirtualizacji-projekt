@@ -1,2 +1,2 @@
-"#METODY WIRTUALIZACJI - PROJEKT " 
-"## 10. Ewidencja godzin pracy "
+#METODY WIRTUALIZACJI - PROJEKT
+## 10. Ewidencja godzin pracy

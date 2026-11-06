@@ -1,4 +1,4 @@
-const backendurl = 'http://localhost:8000';
+const backendurl = 'api';
 
 async function fetchLogs() {
     try {
@@ -30,6 +30,8 @@ document.getElementById('form_workDay').addEventListener('submit', async (e) =>{
         end_hour: document.getElementById('end_hour').value,
         description: document.getElementById('description').value
     };
+    console.log(data)
+    console.log(JSON.stringify(data))
 
     try {
         const response = await fetch(`${backendurl}/logs`,{

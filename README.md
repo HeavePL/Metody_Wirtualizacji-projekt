@@ -2,4 +2,5 @@
 
 ## 10. Ewidencja godzin pracy
 
-### Wymagania dotyczące frontend
+### Struktura JSONA
+

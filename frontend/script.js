@@ -1,4 +1,4 @@
-const backendurl = 'http://localhost:8000';
+const backendurl = '/api';
 
 async function fetchLogs() {
     try {

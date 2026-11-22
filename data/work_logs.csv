@@ -1,0 +1,6 @@
+first_name;last_name;date;start_hour;end_hour;description
+Jan;Kowalski;2026-11-16;08:00:00;16:00:00;Obsługa dokumentacji i korespondencji
+Anna Maria;Nowak-Kowalska;2026-11-16;09:00:00;17:00:00;Kontakt z klientami i realizacja zgłoszeń
+Piotr;Wiśniewski;2026-11-17;07:00:00;15:00:00;Rozwój i utrzymanie aplikacji
+Katarzyna;Wójcik;2026-11-17;08:30:00;16:30:00;Analiza danych i przygotowanie raportów
+Michał;Kamiński;2026-11-18;10:00:00;18:00:00;Spotkania zespołowe i konsultacje projektowe

@@ -10,13 +10,6 @@ app = FastAPI(root_path="/api")
 def get_db_connection():
     return psycopg.connect(DB)
 
-def init_db():
-    with get_db_connection() as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS work_logs (id SERIAL PRIMARY KEY, first_name VARCHAR(100), last_name VARCHAR(100), date DATE, start_hour TIME, end_hour TIME, description TEXT DEFAULT '')")
-    return 0
-
-init_db()#TODO: lepsze umiejscowienie inicjalizacji bazy danych
-
 class WorkLog(BaseModel):
     first_name: str
     last_name: str

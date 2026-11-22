@@ -9,7 +9,8 @@ async function fetchLogs() {
         logs.forEach(log => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${log.employee_name}</td>
+                <td>${log.first_name}</td>
+                <td>${log.last_name}</td>
                 <td>${log.date}</td>
                 <td>${log.start_hour} - ${log.end_hour}</td>
                 <td>${log.description || '-' }</td>
@@ -24,7 +25,8 @@ async function fetchLogs() {
 document.getElementById('form_workDay').addEventListener('submit', async (e) =>{
     e.preventDefault();
     const data = {
-        employee_name: document.getElementById('employee_name').value,
+        first_name: document.getElementById('first_name').value,
+        last_name: document.getElementById('last_name').value,
         date: document.getElementById('date').value,
         start_hour: document.getElementById('start_hour').value,
         end_hour: document.getElementById('end_hour').value,
@@ -43,7 +45,8 @@ document.getElementById('form_workDay').addEventListener('submit', async (e) =>{
             document.getElementById('form_workDay').reset();
             fetchLogs();
         } else {
-            alert('Błąd zapisu danych');
+            const errorData = await response.json();
+            alert(errorData.detail || 'Błąd zapisu danych');
         }
     } catch (error) {
         console.error('Błąd wysyłania danych - ', error);

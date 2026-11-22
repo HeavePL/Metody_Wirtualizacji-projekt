@@ -11,14 +11,15 @@ def get_db_connection():
     return psycopg.connect(DB)
 
 def init_db():
-    with get_db_connection() as conn:  
-        conn.execute("CREATE TABLE IF NOT EXISTS work_logs (id SERIAL PRIMARY KEY, employee_name VARCHAR(100), date DATE, start_hour TIME, end_hour TIME, description TEXT DEFAULT '')")
+    with get_db_connection() as conn:
+        conn.execute("CREATE TABLE IF NOT EXISTS work_logs (id SERIAL PRIMARY KEY, first_name VARCHAR(100), last_name VARCHAR(100), date DATE, start_hour TIME, end_hour TIME, description TEXT DEFAULT '')")
     return 0
 
 init_db()#TODO: lepsze umiejscowienie inicjalizacji bazy danych
 
 class WorkLog(BaseModel):
-    employee_name: str
+    first_name: str
+    last_name: str
     date: str
     start_hour: str
     end_hour: str
@@ -34,17 +35,21 @@ def health():
 def create_log(log: WorkLog):
     pattern_hour = r"([01]\d|2[0-3]):[0-5]\d"
     pattern_date = r"\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])"
+    pattern_first_name = r"[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?: [A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)*"
+    pattern_last_name = r"[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(?:[- ][A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)*"
     if not re.fullmatch(pattern_hour, log.start_hour) or not re.fullmatch(pattern_hour, log.end_hour):
         raise HTTPException(status_code=400, detail="Niepoprawny format godziny. Poprawny format: HH:MM")
     if not re.fullmatch(pattern_date, log.date):
         raise HTTPException(status_code=400, detail="Niepoprawny format daty. Poprawny format: YYYY-MM-DD")
-    if log.employee_name.strip() == "":
-        raise HTTPException(status_code=400, detail="Pole 'employee_name' nie może być puste")
+    if not re.fullmatch(pattern_first_name, log.first_name):
+        raise HTTPException(status_code=400, detail="Niepoprawny format imienia.")
+    if not re.fullmatch(pattern_last_name, log.last_name):
+        raise HTTPException(status_code=400, detail="Niepoprawny format nazwiska.")
     try:
         with get_db_connection() as conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO work_logs (employee_name, date, start_hour, end_hour, description) VALUES (%s, %s, %s, %s, %s) RETURNING id",
-                    (log.employee_name, log.date, log.start_hour, log.end_hour, log.description))
+            cur.execute("INSERT INTO work_logs (first_name, last_name, date, start_hour, end_hour, description) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                    (log.first_name, log.last_name, log.date, log.start_hour, log.end_hour, log.description))
             new_id = cur.fetchone()[0]
         return {"id": new_id, "message": "Zapisano pomyślnie"}
     except Exception as e:
@@ -55,11 +60,11 @@ def get_logs():
     try:
         with get_db_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT id, employee_name, date, start_hour, end_hour, description FROM work_logs ORDER BY date DESC, id DESC")
+            cur.execute("SELECT id, first_name, last_name, date, start_hour, end_hour, description FROM work_logs ORDER BY date DESC, id DESC")
             rows = cur.fetchall()
         logs = []
         for row in rows:
-            logs.append({"id": row[0], "employee_name": row[1], "date": row[2], "start_hour": row[3], "end_hour": row[4], "description": row[5]})
+            logs.append({"id": row[0], "first_name": row[1], "last_name": row[2], "date": row[3], "start_hour": row[4], "end_hour": row[5], "description": row[6]})
         return logs
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -69,13 +74,15 @@ def get_log(id: int):
     try:
         with get_db_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT id, employee_name, date, start_hour, end_hour, description FROM work_logs WHERE id = %s", (id,))
+            cur.execute("SELECT id, first_name, last_name, date, start_hour, end_hour, description FROM work_logs WHERE id = %s", (id,))
             row = cur.fetchone()
             if row is None:
                 raise HTTPException(status_code=404, detail="Log nie istnieje")
-            return {"id": row[0], "employee_name": row[1], "date": row[2], "start_hour": row[3], "end_hour": row[4], "description": row[5]}
+            return {"id": row[0], "first_name": row[1], "last_name": row[2], "date": row[3], "start_hour": row[4], "end_hour": row[5], "description": row[6]}
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500,detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/log/{id}")
 def delete_log(id: int):
@@ -87,5 +94,7 @@ def delete_log(id: int):
             if deleted_id is None:
                 raise HTTPException(status_code=404, detail="Log nie istnieje")
             return {"id": deleted_id[0], "message": "Usunięto pomyślnie"}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

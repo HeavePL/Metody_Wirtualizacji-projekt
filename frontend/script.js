@@ -36,7 +36,7 @@ document.getElementById('form_workDay').addEventListener('submit', async (e) =>{
     console.log(JSON.stringify(data))
 
     try {
-        const response = await fetch(`${backendurl}/logs`,{
+        const response = await fetch(`${backendurl}/log`,{
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(data)

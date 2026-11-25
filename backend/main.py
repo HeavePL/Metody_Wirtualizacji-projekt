@@ -24,7 +24,7 @@ def health():
         conn.execute("SELECT 1")
     return {"status": "ok"}
 
-@app.post("/logs")
+@app.post("/log")
 def create_log(log: WorkLog):
     pattern_hour = r"([01]\d|2[0-3]):[0-5]\d"
     pattern_date = r"\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])"
